@@ -2,7 +2,7 @@
 
 A provenance-aware assertion extraction layer for the Consolidated Witchcraft BindingEngine ecosystem.
 
-Binding Assertions transforms parsed and validated binding documents into structured semantic assertions suitable for inference, conflict detection, graph projection and downstream processing pipelines.
+Binding Assertions transforms parsed and validated binding documents into structured semantic assertions suitable for downstream inference, conflict detection, graph projection and processing pipelines.
 
 ## Purpose
 
@@ -156,10 +156,9 @@ Multiple documents may assert conflicting information. The role of this package 
 | Package                           | Responsibility                                |
 |-----------------------------------|-----------------------------------------------|
 | binding-engine-parser             | Parses binding syntax into AST structures     |
-| binding-engine-parser             | Parses binding syntax into AST structures     |
 | binding-engine-vocabulary	        | Defines semantic vocabulary rules             |
 | binding-engine-vocabulary-loader	 | Loads vocabularies from JSON definitions      |
-| binding-assertions                | Extracts provenance-aware semantic assertions |
+| binding-engine-assertions         | Extracts provenance-aware semantic assertions |
 
 ## License
 Licensed under the GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later).

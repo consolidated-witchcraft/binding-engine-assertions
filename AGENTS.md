@@ -1,10 +1,9 @@
-# AGENTS.md — Binding Vocabulary Library
+# AGENTS.md — BindingEngine Assertions Library
 
-## Previous Development
-Previously, the binding engine parser was developed with substantial assistance from another A.I Agent.# AGENTS.md
+## README.md
+The README.md contains valuable information about the structure of this project and should be consulted, read and followed.
 
 ## Purpose
-
 This repository contains the assertion extraction layer for the Consolidated Witchcraft BindingEngine ecosystem.
 
 The responsibility of this package is:
@@ -44,7 +43,7 @@ Conflict resolution belongs to downstream systems.
 
 ## Provenance Is Mandatory
 
-Assertions MUST preserve provenance information wherever possible.
+Assertions MUST preserve provenance information.
 
 This includes:
 - source document identifiers

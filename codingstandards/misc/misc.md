@@ -7,5 +7,5 @@
 * All interfaces' names must end with the word 'Interface'
 * All Abstract classes' names must begin with the word 'Abstract'
 * All Enums' names must end with the word 'Enum'
-* Always used named arguments when calling class methods.
+* Always use named arguments when calling class methods.
 * Named argument usage must always be in matching order.

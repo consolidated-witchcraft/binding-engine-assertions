@@ -14,15 +14,11 @@
 
         public function __construct(string $valueType, int $code = 0, ?\Throwable $previous = null) {
 
-            parent::__construct(sprintf(self::MESSAGE_PATTERN, $valueType), $code, $previous);
+            parent::__construct(message: sprintf(self::MESSAGE_PATTERN, $valueType), code: $code, previous: $previous);
         }
     }
 ```
-* If a service throws an exception, these are where its various exceptions MUST be located
-  * src/Services/{service name}/Service/Exceptions for exceptions thrown in the Service layer.
-  * src/Services/{service name}/Domain/Exceptions for exceptions thrown in the Domain layer
-  * src/Services/{service name}/Infrastructure/Exceptions for exceptions thrown in the Infrastructure layer
 * Application-level exceptions SHOULD be located next to the class that generates the responses. For example:
   * FooController throws FooException. This SHOULD be located in {fooController's path}/Exceptions
   * The Banana ApiResource throws UnripeBananaException. This SHOULD be located in {banana resource's *provider*'s path}/Exceptions
-* Exceptions MUST NOT have unit tests.
+* Exceptions MUST NOT have unit tests themselves.
