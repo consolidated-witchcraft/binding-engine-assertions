@@ -1,224 +1,255 @@
 # AGENTS.md — Binding Vocabulary Library
 
 ## Previous Development
-Previously, the binding engine parser was developed with substantial assistance from another A.I Agent.
-- The README.md contains important notes on the nature of the project, and the library
+Previously, the binding engine parser was developed with substantial assistance from another A.I Agent.# AGENTS.md
 
 ## Purpose
 
-This repository implements the **vocabulary and validation layer** of the Conundrum Codex Binding Engine system.
+This repository contains the assertion extraction layer for the Consolidated Witchcraft BindingEngine ecosystem.
 
-It operates on the AST produced by the parser and is responsible for determining whether bindings are **semantically valid**.
+The responsibility of this package is:
 
-This library is **not a parser** and must not perform parsing logic.
+- extracting explicit semantic assertions from validated binding documents
+- preserving provenance and source traceability
+- producing immutable assertion structures suitable for downstream reasoning systems
 
----
+This package MUST NOT:
+- perform inference
+- resolve canon
+- reconcile contradictions
+- perform entity resolution
+- mutate source semantics
+- project graph structures
+- silently discard provenance information
 
-## Architectural Position
-
-This library is one stage in a multi-layer pipeline:
-
-1. Parser (external dependency)
-    - Produces AST + syntax diagnostics
-
-2. Vocabulary / Validation (this library)
-    - Defines binding types and attributes
-    - Validates AST nodes
-    - Produces semantic diagnostics
-
-3. Inference (future)
-    - Derives additional meaning
-
-4. Projection (future)
-    - Produces application-facing models
-
-Do not implement inference or projection logic here.
+The package exists to faithfully represent authored semantic claims.
 
 ---
 
-## Core Principles
+# Architectural Principles
 
-### 1. Strict Separation of Concerns
+## Assertions Are Claims, Not Truth
 
-- Do NOT re-parse source text
-- Do NOT inspect raw strings when AST nodes are available
-- Operate only on AST nodes and their properties
+Assertions represent:
+> “This document claims X.”
 
----
+They do NOT represent:
+> “X is objectively true.”
 
-### 2. Validation, Not Transformation
+Multiple conflicting assertions may coexist.
 
-- This library validates input
-- It MUST NOT mutate AST nodes
-- It MUST NOT produce derived or inferred data structures
+Conflict resolution belongs to downstream systems.
 
 ---
 
-### 3. Deterministic Behaviour
+## Provenance Is Mandatory
 
-- Given the same AST and vocabulary, validation MUST produce identical diagnostics
-- No randomness, no hidden state
+Assertions MUST preserve provenance information wherever possible.
 
----
+This includes:
+- source document identifiers
+- source revision identifiers
+- source spans
+- vocabulary identifiers
+- vocabulary versions
 
-### 4. Diagnostics Over Exceptions
+Downstream systems MUST be able to determine:
+- where an assertion originated
+- which vocabulary version produced it
+- which source text created it
 
-- Validation errors MUST be reported as diagnostics
-- Exceptions should only be used for programmer errors (invalid construction, invariants)
-
----
-
-### 5. Parser Is the Source of Truth for Syntax
-
-- Do NOT duplicate regex patterns unless explicitly required
-- Reuse parser-defined constraints where appropriate
-- Do NOT reinterpret syntax at this layer
+Loss of provenance is considered a serious architectural failure.
 
 ---
 
-## Key Concepts
+## Immutable Data Structures
 
-### Vocabulary
+Assertion objects SHOULD be immutable.
 
-Defines the allowed structure of bindings:
+Mutation introduces ambiguity into provenance and downstream reasoning.
 
-- Binding types (e.g. `event`, `person`)
-- Attribute definitions
-- Payload expectations
+Prefer:
+- readonly classes
+- value objects
+- constructor validation
 
----
-
-### AttributeDefinition
-
-Defines:
-
-- identifier
-- value type
-- required / optional
-- repeatable / non-repeatable
-- allowed values (optional)
+Avoid:
+- setters
+- mutable collections
+- hidden internal state
 
 ---
 
-### BindingTypeDefinition
+## Explicitness Over Implicit Behaviour
 
-Defines:
+This package prioritises:
+- deterministic extraction
+- explicit semantics
+- transparent data flow
 
-- binding type name
-- allowed attributes
-- required attributes
-- payload shape (shorthand vs attribute list)
+Avoid:
+- magical inference
+- heuristic interpretation
+- hidden transformations
 
----
-
-### Validator
-
-Consumes:
-
-- `DocumentNode` (from parser)
-- `Vocabulary`
-
-Produces:
-
-- list of diagnostics
+If a semantic relationship is inferred rather than explicitly authored, it belongs in a downstream inference layer.
 
 ---
 
-## Constraints
+# Repository Standards
 
-### DO
+## PHP Standards
 
-- Use AST node types (`BindingNode`, `AttributeListPayloadNode`, etc.)
-- Use spans from nodes when creating diagnostics
-- Keep validation rules explicit and readable
-- Write Pest tests for all validation behaviour
-
----
-
-### DO NOT
-
-- Do not modify AST nodes
-- Do not introduce parsing logic
-- Do not access raw source text unless via `SourceSpan::extract`
-- Do not assume inference (e.g. relationships between bindings)
-- Do not silently ignore invalid states
+- `declare(strict_types=1);` is mandatory
+- PHPStan MUST pass at maximum configured level
+- `treatPhpDocTypesAsCertain: true` is enforced
+- All public APIs MUST be fully typed
+- Array shapes MUST be documented where appropriate
+- Prefer small immutable value objects over associative arrays
 
 ---
 
-## Diagnostics
+## Exceptions
 
-- Use the shared `Diagnostic` class from the parser
-- Always include:
-    - message
-    - code
-    - severity
-    - source span (if available)
+Exceptions MUST:
+- be domain-specific
+- carry meaningful contextual information
+- preserve previous exceptions
 
-Diagnostics should be:
+Never throw:
+- `\Exception`
+- `\RuntimeException`
+- `\Throwable`
 
-- precise
+except at application boundaries.
+
+---
+
+## Testing Standards
+
+All behaviour MUST be covered by tests.
+
+Tests SHOULD:
+- validate successful construction paths
+- validate failure paths
+- validate edge cases
+- validate provenance preservation
+- validate deterministic output
+
+Tests MUST:
+- assert exact exception types
+- assert exact diagnostic/error messages where stable
+- avoid hidden coupling between test cases
+
+Boundary tests are required for:
+- identifier validation
+- semantic version validation
+- provenance handling
+- duplicate detection
+- malformed assertion structures
+
+---
+
+## Provenance Handling
+
+Source provenance is first-class system data.
+
+When introducing new assertion types or extraction paths:
+- provenance MUST be preserved
+- source spans MUST remain accurate
+- vocabulary context MUST remain attached
+
+Assertions without provenance are considered invalid architecture.
+
+---
+
+## Assertions vs Inference
+
+Keep extraction and inference strictly separated.
+
+This repository extracts:
+- explicit authored semantic structures
+
+It does NOT:
+- derive new facts
+- interpret causality
+- reconcile conflicting information
+- determine canonical truth
+
+Do not introduce inference behaviour into extraction code.
+
+---
+
+## Vocabulary Compatibility
+
+Assertions are generated against a specific vocabulary version.
+
+Code MUST assume:
+- vocabularies evolve over time
+- assertion meaning may vary between versions
+- downstream migration systems may exist
+
+Never assume:
+- vocabulary identifiers are globally stable without versions
+- assertion semantics are timeless
+
+Vocabulary version context MUST remain attached to assertions.
+
+---
+
+## Preferred Design Style
+
+Prefer:
+- composition over inheritance
+- small focused services
+- immutable DTOs/value objects
+- explicit constructor validation
+- deterministic transforms
+
+Avoid:
+- service locators
+- hidden global state
+- reflection-heavy behaviour
+- runtime mutation
+- implicit magic resolution
+
+---
+
+## Commit Standards
+
+Commits MUST:
+- pass the full test suite
+- pass PHPStan
+- preserve backwards compatibility unless intentionally breaking
+- maintain provenance guarantees
+
+Do not commit:
+- failing tests
+- partially implemented extraction logic
+- dead code
+- debugging artefacts
+
+---
+
+## Long-Term Direction
+
+This package is intended to become:
 - stable
-- predictable (important for UI highlighting)
-
----
-
-## Testing Guidelines
-
-- Use Pest
-- Prefer small, focused tests
-- Cover:
-    - valid cases
-    - invalid cases
-    - edge cases (duplicates, missing attributes, etc.)
-
-- When possible:
-    - assert on diagnostic codes
-    - assert on spans via `extract()`
-
----
-
-## Naming Conventions
-
-- Use kebab-case identifiers for binding types and attributes
-- Follow parser constraints for identifiers
-- Keep naming consistent with parser terminology
-
----
-
-## Extensibility
-
-This library is expected to be extended by consumers:
-
-- Do not hardcode domain-specific binding types
-- Do not assume specific vocabularies (e.g. `event`, `person`)
-- Keep APIs generic and composable
-
----
-
-## Future Considerations
-
-This library will later integrate with:
-
-- inference layer
-- projection layer
-- link resolution
-
-Do not pre-emptively implement those concerns here.
-
----
-
-## Summary
-
-This library answers:
-
-> “Is this binding valid according to the defined vocabulary?”
-
-It must remain:
-
-- pure
 - deterministic
-- side-effect free
-- independent of higher-level semantics
+- provenance-safe
+- infrastructure-grade
+
+Optimise for:
+- correctness
+- traceability
+- maintainability
+- semantic clarity
+
+over:
+- convenience
+- hidden abstraction
+- premature optimisation
+- cleverness
 
 ## Coding Standards
 Coding standards are contained within the `./codingstandards/` subdirectory, and MUST be followed.
