@@ -2,7 +2,7 @@
 
 A provenance-aware assertion extraction layer for the Consolidated Witchcraft BindingEngine ecosystem.
 
-Binding Assertions transforms parsed and validated binding documents into structured semantic assertions suitable for downstream inference, conflict detection, graph projection and processing pipelines.
+Binding Assertions transforms parsed and vocabulary-validated binding documents into structured semantic assertions suitable for downstream inference, conflict detection, graph projection and other processing pipelines.
 
 ## Purpose
 
@@ -48,6 +48,8 @@ The assertion layer produces structured assertions describing:
 - source provenance
 - source spans
 - associated vocabulary/version context
+
+Assertions are returned as immutable `AssertionSet` collections.
 
 Example conceptual output:
 ```text
@@ -113,7 +115,7 @@ AST
 ↓
 Vocabulary Validator
 ↓
-Validated Document
+Assertion Extraction
 ↓
 Binding Assertions
 ↓
@@ -151,14 +153,85 @@ This distinction is important.
 
 Multiple documents may assert conflicting information. The role of this package is to preserve and expose those assertions faithfully — not to decide which is canonical.
 
+## Usage
+```php
+<?php
+
+declare(strict_types=1);
+
+use ConsolidatedWitchcraft\BindingEngine\Assertions\AstAssertionExtractor;
+use ConsolidatedWitchcraft\BindingEngine\Assertions\SourceContext;
+use ConsolidatedWitchcraft\BindingEngine\Parser\Parser;
+use ConsolidatedWitchcraft\BindingEngine\Vocabulary\Validator;
+use ConsolidatedWitchcraft\BindingEngine\VocabularyLoader\JsonVocabularyLoader;
+
+$parser = new Parser();
+$vocabularyLoader = new JsonVocabularyLoader();
+$extractor = new AstAssertionExtractor();
+
+$source = <<<MARKDOWN
+@person[jane-austen](Jane Austen)
+
+@event[
+    type: birth,
+    subject: jane-austen,
+    date: 1775-12-16
+](Birth of Jane Austen)
+MARKDOWN;
+
+$vocabulary = $vocabularyLoader->load(
+    file_get_contents(__DIR__ . '/vocabulary.json'),
+);
+
+$parseResult = $parser->parse($source);
+
+if ($parseResult->hasErrors()) {
+    throw new RuntimeException('Document contains parser errors.');
+}
+
+$validator = new Validator($vocabulary);
+
+$validationResult = $validator->validate(
+    $parseResult->getDocument(),
+);
+
+if ($validationResult->hasErrors()) {
+    throw new RuntimeException('Document failed vocabulary validation.');
+}
+
+$sourceContext = new SourceContext(
+    sourceId: 'worldbook',
+    documentId: 'doc-123',
+    revisionId: 'rev-456',
+    vocabularyIdentifier: $vocabulary->getIdentifier(),
+    vocabularyVersion: $vocabulary->getVersion(),
+);
+
+$assertionSet = $extractor->extract(
+    document: $parseResult->getDocument(),
+    sourceContext: $sourceContext,
+);
+
+foreach ($assertionSet->getAssertions() as $assertion) {
+    var_dump($assertion);
+}
+```
+### Important
+The assertion extractor assumes:
+
+- parser validation has already succeeded
+- vocabulary validation has already succeeded
+
+Malformed or semantically invalid bindings should _not_ be passed into the assertion layer.
+
 ## Related Packages
 
-| Package                           | Responsibility                                |
-|-----------------------------------|-----------------------------------------------|
-| binding-engine-parser             | Parses binding syntax into AST structures     |
-| binding-engine-vocabulary	        | Defines semantic vocabulary rules             |
-| binding-engine-vocabulary-loader	 | Loads vocabularies from JSON definitions      |
-| binding-engine-assertions         | Extracts provenance-aware semantic assertions |
+| Package                                                   | Responsibility                                |
+|-----------------------------------------------------------|-----------------------------------------------|
+| consolidated-witchcraft/binding-engine-parser             | Parses binding syntax into AST structures     |
+| consolidated-witchcraft/binding-engine-vocabulary         | Defines semantic vocabulary rules             |
+| consolidated-witchcraft/binding-engine-vocabulary-loader	 | Loads vocabularies from JSON definitions      |
+| consolidated-witchcraft/binding-engine-assertions         | Extracts provenance-aware semantic assertions |
 
 ## License
 Licensed under the GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later).

@@ -141,3 +141,20 @@ it('groups duplicate attribute assignments into value lists', function () {
         ->and($assertion->getAttributeValues('tag'))->toBe(['war', 'historic', 'political'])
         ->and($assertion->getFirstAttributeValue('tag'))->toBe('war');
 });
+
+it('does not extract assertions from malformed bindings parsed as text', function () {
+    $parser = new Parser();
+    $extractor = new AstAssertionExtractor();
+
+    $source = '@person[] and ordinary text';
+
+    $parseResult = $parser->parse($source);
+
+    $assertionSet = $extractor->extract(
+        document: $parseResult->getDocument(),
+        sourceContext: makeExtractorSourceContext(),
+    );
+
+    expect($assertionSet->isEmpty())->toBeTrue()
+        ->and($assertionSet->count())->toBe(0);
+});
