@@ -52,6 +52,7 @@ The assertion layer produces structured assertions describing:
 Assertions are returned as immutable `AssertionSet` collections.
 
 Example conceptual output:
+
 ```text
 Assertion
 ├── bindingType: event
@@ -115,9 +116,7 @@ AST
 ↓
 Vocabulary Validator
 ↓
-Assertion Extraction
-↓
-Binding Assertions
+Assertion Extractor
 ↓
 Assertion Set
 ↓
