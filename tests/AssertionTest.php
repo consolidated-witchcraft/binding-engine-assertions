@@ -273,3 +273,36 @@ it('rejects attributes with empty values', function () {
         'Assertion attribute "type" must not contain empty values.',
     );
 });
+
+it('preserves provenance fields through an assertion', function () {
+    $sourceSpan = new SourceSpan(10, 42);
+
+    $sourceContext = new SourceContext(
+        sourceId: 'worldbook',
+        documentId: '01JV7M9K6J0V8V3V5S2N6X4M1Q',
+        revisionId: '01JV7MB3H3H4X9R8K7C2W1F5ZP',
+        vocabularyIdentifier: 'test-vocabulary',
+        vocabularyVersion: '0.1.0',
+    );
+
+    $raw = '@person[jane-austen](Jane Austen)';
+
+    $assertion = new Assertion(
+        bindingType: 'person',
+        payloadShape: BindingPayloadShapeEnum::Shorthand,
+        shorthandValue: 'jane-austen',
+        attributes: [],
+        label: 'Jane Austen',
+        raw: $raw,
+        sourceSpan: $sourceSpan,
+        sourceContext: $sourceContext,
+    );
+
+    expect($assertion->getSourceContext()->getSourceId())->toBe('worldbook')
+        ->and($assertion->getSourceContext()->getDocumentId())->toBe('01JV7M9K6J0V8V3V5S2N6X4M1Q')
+        ->and($assertion->getSourceContext()->getRevisionId())->toBe('01JV7MB3H3H4X9R8K7C2W1F5ZP')
+        ->and($assertion->getSourceContext()->getVocabularyIdentifier())->toBe('test-vocabulary')
+        ->and($assertion->getSourceContext()->getVocabularyVersion())->toBe('0.1.0')
+        ->and($assertion->getRaw())->toBe($raw)
+        ->and($assertion->getSourceSpan())->toBe($sourceSpan);
+});

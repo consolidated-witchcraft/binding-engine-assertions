@@ -6,7 +6,6 @@ namespace ConsolidatedWitchcraft\BindingEngine\Assertions;
 
 use ConsolidatedWitchcraft\BindingEngine\Assertions\Exceptions\AssertionExtractionException;
 use ConsolidatedWitchcraft\BindingEngine\Assertions\Exceptions\InvalidAssertionException;
-use ConsolidatedWitchcraft\BindingEngine\Assertions\Exceptions\InvalidAssertionSetException;
 use ConsolidatedWitchcraft\BindingEngine\Assertions\Interfaces\AssertionExtractorInterface;
 use ConsolidatedWitchcraft\BindingEngine\Parser\Ast\Nodes\AttributeListPayloadNode;
 use ConsolidatedWitchcraft\BindingEngine\Parser\Ast\Nodes\BindingNode;
@@ -36,17 +35,7 @@ final readonly class AstAssertionExtractor implements AssertionExtractorInterfac
             );
         }
 
-        try {
-            return new AssertionSet($assertions);
-        } catch (InvalidAssertionSetException $exception) {
-            throw new AssertionExtractionException(
-                message: sprintf(
-                    'Failed to construct assertion set: %s',
-                    $exception->getMessage(),
-                ),
-                previous: $exception,
-            );
-        }
+        return new AssertionSet($assertions);
     }
 
     /**

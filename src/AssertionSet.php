@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace ConsolidatedWitchcraft\BindingEngine\Assertions;
 
-use ConsolidatedWitchcraft\BindingEngine\Assertions\Exceptions\InvalidAssertionSetException;
-
 readonly class AssertionSet
 {
     /**
      * @param list<Assertion> $assertions
-     *
-     * @throws InvalidAssertionSetException
      */
     public function __construct(
         private array $assertions,

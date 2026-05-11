@@ -110,3 +110,55 @@ it('filters assertions by source document id', function () {
         ])
         ->and($assertionSet->getBySourceDocumentId('missing'))->toBe([]);
 });
+
+it('preserves assertion instances and provenance when filtering by binding type', function () {
+    $sourceContext = makeAssertionSetSourceContext();
+
+    $personAssertion = makeAssertionForSet('person', $sourceContext);
+    $eventAssertion = makeAssertionForSet('event', $sourceContext);
+
+    $assertionSet = new AssertionSet([
+        $personAssertion,
+        $eventAssertion,
+    ]);
+
+    $matches = $assertionSet->getByBindingType('person');
+
+    expect($matches)->toHaveCount(1)
+        ->and($matches[0])->toBe($personAssertion)
+        ->and($matches[0]->getSourceContext())->toBe($sourceContext)
+        ->and($matches[0]->getSourceContext()->getSourceId())->toBe('worldbook')
+        ->and($matches[0]->getSourceContext()->getDocumentId())->toBe($sourceContext->getDocumentId())
+        ->and($matches[0]->getSourceContext()->getRevisionId())->toBe($sourceContext->getRevisionId())
+        ->and($matches[0]->getSourceContext()->getVocabularyIdentifier())->toBe('test-vocabulary')
+        ->and($matches[0]->getSourceContext()->getVocabularyVersion())->toBe('0.1.0');
+});
+
+it('preserves assertion instances and provenance when filtering by source document id', function () {
+    $firstSourceContext = makeAssertionSetSourceContext(
+        documentId: '01JV7M9K6J0V8V3V5S2N6X4M1Q',
+    );
+
+    $secondSourceContext = makeAssertionSetSourceContext(
+        documentId: '01JV7N0R9N1P8D4S6M7B8C9D0E',
+    );
+
+    $firstAssertion = makeAssertionForSet('person', $firstSourceContext);
+    $secondAssertion = makeAssertionForSet('event', $secondSourceContext);
+
+    $assertionSet = new AssertionSet([
+        $firstAssertion,
+        $secondAssertion,
+    ]);
+
+    $matches = $assertionSet->getBySourceDocumentId('01JV7M9K6J0V8V3V5S2N6X4M1Q');
+
+    expect($matches)->toHaveCount(1)
+        ->and($matches[0])->toBe($firstAssertion)
+        ->and($matches[0]->getSourceContext())->toBe($firstSourceContext)
+        ->and($matches[0]->getSourceContext()->getSourceId())->toBe('worldbook')
+        ->and($matches[0]->getSourceContext()->getDocumentId())->toBe('01JV7M9K6J0V8V3V5S2N6X4M1Q')
+        ->and($matches[0]->getSourceContext()->getRevisionId())->toBe($firstSourceContext->getRevisionId())
+        ->and($matches[0]->getSourceContext()->getVocabularyIdentifier())->toBe('test-vocabulary')
+        ->and($matches[0]->getSourceContext()->getVocabularyVersion())->toBe('0.1.0');
+});

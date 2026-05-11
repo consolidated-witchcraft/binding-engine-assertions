@@ -11,7 +11,7 @@ use ConsolidatedWitchcraft\BindingEngine\Vocabulary\Vocabulary;
 readonly class SourceContext
 {
     /**
-     * @throws InvalidSourceContextException|InvalidVocabularyException
+     * @throws InvalidSourceContextException
      */
     public function __construct(
         private string $sourceId,
