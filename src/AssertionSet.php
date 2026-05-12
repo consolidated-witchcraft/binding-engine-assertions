@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace ConsolidatedWitchcraft\BindingEngine\Assertions;
 
-readonly class AssertionSet
+use ConsolidatedWitchcraft\BindingEngine\Assertions\Interfaces\AssertionSetInterface;
+
+readonly class AssertionSet implements AssertionSetInterface
 {
     /**
      * @param list<Assertion> $assertions

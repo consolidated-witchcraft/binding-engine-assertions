@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace ConsolidatedWitchcraft\BindingEngine\Assertions;
 
 use ConsolidatedWitchcraft\BindingEngine\Assertions\Exceptions\InvalidAssertionException;
+use ConsolidatedWitchcraft\BindingEngine\Assertions\Interfaces\AssertionInterface;
 use ConsolidatedWitchcraft\BindingEngine\Parser\Ast\Interfaces\SourceSpanInterface;
 use ConsolidatedWitchcraft\BindingEngine\Vocabulary\Enums\BindingPayloadShapeEnum;
 
-readonly class Assertion
+readonly class Assertion implements AssertionInterface
 {
     /**
      * @param array<string, list<string>> $attributes
